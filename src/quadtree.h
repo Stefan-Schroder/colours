@@ -3,28 +3,41 @@
 
 #include <vector>
 #include <SFML/Graphics.hpp>
+#include "box.h"
+#include "particle.h"
 
 #define CAPACITY 100
 
-template <typename T>
-class QuadTree {
-public:
-    QuadTree(sf::Vector2u, sf::Vector2u);
-    ~QuadTree();
+typedef std::vector<Particle*>::iterator Iterator;
 
-    void Insert(sf::Vector2u, T);
+class QuadTree
+{
+    using node_id = std::uint32_t;
+    static constexpr node_id null = node_id(-1);
+
+    struct qNode {
+    public:
+        qNode(Box);
+
+        void build(QuadTree*, Iterator, Iterator, node_id);
+
+    private:
+        Box boundary;
+
+        node_id children [4] = {
+            null, null,
+            null, null
+        };
+
+        Iterator begin_data;
+        Iterator end_data;
+    };
+
+public:
+    QuadTree(Box boundary, Iterator begin, Iterator end);
+    // ~QuadTree();
 
 private:
-    sf::Vector2u top_left;
-    sf::Vector2u bottom_right; // up to, not including
-
-    std::vector<T> items;
-
-    QuadTree<T>* Contained(sf::Vector2u position);
-
-    QuadTree<T>* NW = nullptr;
-    QuadTree<T>* NE = nullptr;
-    QuadTree<T>* SE = nullptr;
-    QuadTree<T>* SW = nullptr;
+    std::vector<qNode> quadNodes; // root is always the first qNode
 };
 #endif

@@ -36,7 +36,6 @@ void ParticleController::PhysicsUpdate(float dTime, sf::RenderWindow& window, bo
 {
     for (auto particle : this->particles)
     {
-
         particle->Update(dTime, window.getSize(), GetLocal(particle->GetPosition()), is_pressed);
 
         if (!particle->isAlive())

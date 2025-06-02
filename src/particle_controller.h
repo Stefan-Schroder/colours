@@ -11,6 +11,9 @@
 #include "particle.h"
 #include "math_utils.h"
 
+#include "quadtree.h"
+#include "box.h"
+
 #define PERCEPTION 50
 #define PARTICLES 5000
 

@@ -1,85 +1,70 @@
 #include "quadtree.h"
 
-template <typename T>
-QuadTree<T>::QuadTree(sf::Vector2u top_left, sf::Vector2u bottom_right): top_left(top_left), bottom_right(bottom_right)
+// template <typename T>
+// QuadTree<T>::~QuadTree()
+// {
+//     for (auto qNode : this->quadNodes)
+//     {
+//         delete qNode;
+//     }
+// }
+
+QuadTree::QuadTree(Box boundary, Iterator begin, Iterator end)
+{
+    quadNodes.push_back(qNode(boundary));
+    quadNodes[0].build(this, begin, end, 0);
+}
+
+QuadTree::qNode::qNode(Box box): boundary(box)
 {}
 
-template <typename T>
-QuadTree<T>::~QuadTree()
+void QuadTree::qNode::build(QuadTree* qt, Iterator begin, Iterator end, node_id parent_id)
 {
-    items.clear();
+    this->begin_data = begin;
+    this->end_data = end;
 
-    if (NW == nullptr)
-        return;
+    if (this->end_data - this->begin_data < CAPACITY)
+    { return; }
 
-    delete this->NW;
-    delete this->NE;
-    delete this->SE;
-    delete this->SW;
+    auto new_boxes = this->boundary.subdivide();
+
+    auto mid_point = this->boundary.center();
+
+    auto y_split = std::partition(begin,end,
+    [&mid_point](Particle* const p)
+    {
+        return p->GetPosition().y < mid_point.y;
+    });
+
+    auto Top_LR_split = std::partition(begin,y_split,
+    [&mid_point](Particle* const p)
+    {
+        return p->GetPosition().x < mid_point.x;
+    });
+
+    auto Bottom_LR_split = std::partition(y_split,end,
+    [&mid_point](Particle* const p)
+    {
+        return p->GetPosition().x < mid_point.x;
+    });
+
+    qt->quadNodes.push_back(new_boxes[0]);
+    this->children[0] = parent_id + 1;
+
+    qt->quadNodes.push_back(new_boxes[1]);
+    this->children[1] = parent_id + 2;
+
+    qt->quadNodes.push_back(new_boxes[2]);
+    this->children[2] = parent_id + 3;
+
+    qt->quadNodes.push_back(new_boxes[3]);
+    this->children[3] = parent_id + 4;
+
+
+    // now recursively add the data
+    qt->quadNodes[this->children[0]].build(qt, this->begin_data, Top_LR_split, this->children[0]);
+    qt->quadNodes[this->children[1]].build(qt, this->begin_data, Top_LR_split, this->children[1]);
+    qt->quadNodes[this->children[2]].build(qt, this->begin_data, Top_LR_split, this->children[2]);
+    qt->quadNodes[this->children[3]].build(qt, this->begin_data, Top_LR_split, this->children[3]);
 }
 
-template <typename T>
-QuadTree<T>* QuadTree<T>::Contained(sf::Vector2u position)
-{
-    if (NW == nullptr)
-        return this;
-
-    sf::Vector2i mid_point( (bottom_right.x - top_left.x)/2 + top_left.x,
-                            (bottom_right.y - top_left.y)/2 + top_left.y);
-
-    sf::Vector2i difference = mid_point - sf::Vector2i(position);
-
-    if (difference.y < 0)
-    {
-        if (difference.x < 0)
-            return NW;
-        else
-            return NE;
-    }
-    else
-    {
-        if (difference.x < 0)
-            return SW;
-        else
-            return SE;
-    }
-}
-
-template <typename T>
-void QuadTree<T>::Insert(sf::Vector2u position, T item)
-{
-    if (NW == nullptr)
-    {
-        if (this->items.size() < CAPACITY)
-        {
-            this->items.push_back(item);
-            return;
-        }
-        else
-        {
-            // subdivide
-            sf::Vector2u mid_point( (bottom_right.x - top_left.x)/2 + top_left.x,
-                                    (bottom_right.y - top_left.y)/2 + top_left.y);
-
-            this->NW = new QuadTree(this->top_left, mid_point);
-
-            this->NE = new QuadTree(sf::Vector2u(mid_point.x, top_left.y),
-                                    sf::Vector2u(bottom_right.x, mid_point.y));
-
-            this->SE = new QuadTree(mid_point, bottom_right);
-
-            this->SW = new QuadTree(sf::Vector2u(top_left.x, mid_point.y),
-                                    sf::Vector2u(mid_point.x, bottom_right.y));
-
-            for (auto old_item : items)
-            {
-                Contained(position)->Insert(old_item, position);
-            }
-        }
-    }
-    else
-    {
-        Contained(position)->Insert(item, position);
-    }
-    
-}
