@@ -6,7 +6,7 @@
 #include "box.h"
 #include "particle.h"
 
-#define CAPACITY 100
+#define CAPACITY 2
 
 typedef std::vector<Particle*>::iterator Iterator;
 
@@ -20,6 +20,7 @@ class QuadTree
         qNode(Box);
 
         void build(QuadTree*, Iterator, Iterator, node_id);
+        Box getBoundary() { return boundary; };
 
     private:
         Box boundary;
@@ -36,6 +37,8 @@ class QuadTree
 public:
     QuadTree(Box boundary, Iterator begin, Iterator end);
     // ~QuadTree();
+
+    void Draw(sf::RenderWindow&);
 
 private:
     std::vector<qNode> quadNodes; // root is always the first qNode

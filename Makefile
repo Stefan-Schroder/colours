@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS = -std=c++17 -Wall -I/usr/include -O4
+CXXFLAGS = -std=c++17 -Wall -I/usr/include -O0 -g
 
 # SFML libraries
 LDFLAGS = -lsfml-graphics -lsfml-window -lsfml-system

@@ -15,6 +15,21 @@ QuadTree::QuadTree(Box boundary, Iterator begin, Iterator end)
     quadNodes[0].build(this, begin, end, 0);
 }
 
+void QuadTree::Draw(sf::RenderWindow& window)
+{
+    for (auto node : this->quadNodes)
+    {
+        Box nodeb = node.getBoundary();
+        sf::RectangleShape shape;
+        shape.setSize(sf::Vector2f(nodeb.br() - nodeb.tl()));
+        shape.setPosition(nodeb.tl().x, nodeb.tl().y);
+        shape.setOutlineColor(sf::Color::White);
+        shape.setFillColor(sf::Color::Transparent);
+        shape.setOutlineThickness(1.0f);
+        window.draw(shape);
+    }
+}
+
 QuadTree::qNode::qNode(Box box): boundary(box)
 {}
 
@@ -23,7 +38,7 @@ void QuadTree::qNode::build(QuadTree* qt, Iterator begin, Iterator end, node_id 
     this->begin_data = begin;
     this->end_data = end;
 
-    if (this->end_data - this->begin_data < CAPACITY)
+    if (this->end_data - this->begin_data <= CAPACITY)
     { return; }
 
     auto new_boxes = this->boundary.subdivide();
@@ -63,8 +78,9 @@ void QuadTree::qNode::build(QuadTree* qt, Iterator begin, Iterator end, node_id 
 
     // now recursively add the data
     qt->quadNodes[this->children[0]].build(qt, this->begin_data, Top_LR_split, this->children[0]);
-    qt->quadNodes[this->children[1]].build(qt, this->begin_data, Top_LR_split, this->children[1]);
-    qt->quadNodes[this->children[2]].build(qt, this->begin_data, Top_LR_split, this->children[2]);
-    qt->quadNodes[this->children[3]].build(qt, this->begin_data, Top_LR_split, this->children[3]);
+    qt->quadNodes[this->children[1]].build(qt, Top_LR_split, y_split, this->children[1]);
+    qt->quadNodes[this->children[2]].build(qt, y_split, Bottom_LR_split, this->children[2]);
+    qt->quadNodes[this->children[3]].build(qt, Bottom_LR_split, this->end_data, this->children[3]);
 }
+
 

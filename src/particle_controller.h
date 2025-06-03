@@ -15,7 +15,8 @@
 #include "box.h"
 
 #define PERCEPTION 50
-#define PARTICLES 5000
+// #define PARTICLES 5000
+#define PARTICLES 100
 
 class ParticleController
 {

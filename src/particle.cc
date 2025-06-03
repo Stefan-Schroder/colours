@@ -33,11 +33,11 @@ void Particle::Update(float dTime, sf::Vector2u bounds, std::vector<Particle*> l
             || this->position.y < 0)
     {
         // this->is_alive = false;
-        if (this->position.x > bounds.x)
+        if (this->position.x >= bounds.x)
             this->position.x = 0;
         if (this->position.x < 0)
             this->position.x = bounds.x;
-        if (this->position.y > bounds.y)
+        if (this->position.y >= bounds.y)
             this->position.y = 0;
         if (this->position.y < 0)
             this->position.y = bounds.y;
