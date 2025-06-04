@@ -14,9 +14,9 @@
 #include "quadtree.h"
 #include "box.h"
 
-#define PERCEPTION 50
-// #define PARTICLES 5000
-#define PARTICLES 100
+#define PERCEPTION 25
+#define PARTICLES 10000
+// #define PARTICLES 100
 
 class ParticleController
 {

@@ -15,6 +15,15 @@ QuadTree::QuadTree(Box boundary, Iterator begin, Iterator end)
     quadNodes[0].build(this, begin, end, 0);
 }
 
+std::vector<Particle*> QuadTree::Query(sf::Vector2f point, float distance)
+{
+    std::vector<Particle*> particles;
+    // std::cout << "searching.." << std::endl;
+    this->quadNodes[0].CollectParticles(this, particles, point, distance);
+    // std::cout << "Found " << particles.size() << " particles" << std::endl;
+    return particles;
+}
+
 void QuadTree::Draw(sf::RenderWindow& window)
 {
     for (auto node : this->quadNodes)
@@ -63,24 +72,74 @@ void QuadTree::qNode::build(QuadTree* qt, Iterator begin, Iterator end, node_id 
         return p->GetPosition().x < mid_point.x;
     });
 
+    node_id child_0 = qt->quadNodes.size();
     qt->quadNodes.push_back(new_boxes[0]);
-    this->children[0] = parent_id + 1;
+    qt->quadNodes[parent_id].children[0] = child_0;
 
+    node_id child_1 = qt->quadNodes.size();
     qt->quadNodes.push_back(new_boxes[1]);
-    this->children[1] = parent_id + 2;
+    qt->quadNodes[parent_id].children[1] = child_1;
 
+    node_id child_2 = qt->quadNodes.size();
     qt->quadNodes.push_back(new_boxes[2]);
-    this->children[2] = parent_id + 3;
+    qt->quadNodes[parent_id].children[2] = child_2;
 
+    node_id child_3 = qt->quadNodes.size();
     qt->quadNodes.push_back(new_boxes[3]);
-    this->children[3] = parent_id + 4;
+    qt->quadNodes[parent_id].children[3] = child_3;
 
+    // Debug output
+    // std::cout << "Inside " << parent_id << std::endl;
+    // std::cout << "TL " << child_0 << " is getting: " << top_left.size() << " parts" << std::endl;
+    // std::cout << "TR " << child_1 << " is getting: " << top_right.size() << " parts" << std::endl;
+    // std::cout << "BL " << child_2 << " is getting: " << bottom_left.size() << " parts" << std::endl;
+    // std::cout << "BR " << child_3 << " is getting: " << bottom_right.size() << " parts" << std::endl;
 
-    // now recursively add the data
-    qt->quadNodes[this->children[0]].build(qt, this->begin_data, Top_LR_split, this->children[0]);
-    qt->quadNodes[this->children[1]].build(qt, Top_LR_split, y_split, this->children[1]);
-    qt->quadNodes[this->children[2]].build(qt, y_split, Bottom_LR_split, this->children[2]);
-    qt->quadNodes[this->children[3]].build(qt, Bottom_LR_split, this->end_data, this->children[3]);
+    // Recursively build child nodes
+    qt->quadNodes[child_0].build(qt, this->begin_data, Top_LR_split, child_0);
+    qt->quadNodes[child_1].build(qt, Top_LR_split, y_split, child_1);
+    qt->quadNodes[child_2].build(qt, y_split, Bottom_LR_split, child_2);
+    qt->quadNodes[child_3].build(qt, Bottom_LR_split, this->end_data, child_3);
 }
 
-
+void QuadTree::qNode::CollectParticles(QuadTree* qt, std::vector<Particle*>& parts, sf::Vector2f origin, float distance)
+{
+    switch (this->boundary.CheckCoverage(origin, distance))
+    {
+        case Box::NONE:
+            // std::cout << "No coverage... thats crazy" << std::endl;
+            return;
+        case Box::PARTUAL:
+            if (this->children[0] != null)
+            {
+                // std::cout << "partial going deaper" << std::endl;
+                qt->quadNodes[this->children[0]].CollectParticles(qt, parts, origin, distance);
+                qt->quadNodes[this->children[1]].CollectParticles(qt, parts, origin, distance);
+                qt->quadNodes[this->children[2]].CollectParticles(qt, parts, origin, distance);
+                qt->quadNodes[this->children[3]].CollectParticles(qt, parts, origin, distance);
+            }
+            else
+            {
+                // std::cout << "partial leaf" << std::endl;
+                auto iter = this->begin_data;
+                while (iter != this->end_data)
+                {
+                    if (mu::cheap_dist(origin, (*iter)->GetPosition()) < distance*distance)
+                    {
+                        parts.push_back(*iter);
+                    }
+                    iter++;
+                }
+            }
+            break;
+        case Box::FULLY:
+            // std::cout << "fully covered that" << std::endl;
+            auto iter = this->begin_data;
+            while (iter != this->end_data)
+            {
+                parts.push_back(*iter);
+                iter++;
+            }
+            break;
+    }
+}

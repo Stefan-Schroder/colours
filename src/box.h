@@ -2,6 +2,7 @@
 #define _BOX_H_
 
 #include <SFML/Graphics.hpp>
+#include "math_utils.h"
 
 class Box
 {
@@ -21,7 +22,8 @@ public:
         );
     };
 
-    std::array<Box, 4> subdivide() {
+    std::array<Box, 4> subdivide() 
+    {
         auto mid_point = this->center();
 
         Box TL(this->top_left, mid_point);
@@ -36,6 +38,35 @@ public:
 
         return {TL, TR, BL, BR};
     };
+
+    enum covered {
+        NONE,
+        PARTUAL,
+        FULLY
+    };
+
+    covered CheckCoverage(sf::Vector2f origin, float distance)
+    {
+        auto cheap_distance = distance*2;
+
+        if (mu::cheap_dist(origin, sf::Vector2f(tl())) < cheap_distance &&
+                mu::cheap_dist(origin, sf::Vector2f(tr())) < cheap_distance &&
+                mu::cheap_dist(origin, sf::Vector2f(bl())) < cheap_distance &&
+                mu::cheap_dist(origin, sf::Vector2f(br())) < cheap_distance)
+        {
+            return FULLY;
+        }
+
+        if (origin.x + distance < tl().x ||
+            origin.x - distance > br().x ||
+            origin.y + distance < tl().y ||
+            origin.y - distance > br().y)
+        {
+            return NONE;
+        }
+
+        return PARTUAL;
+    }
 
 private:
     sf::Vector2u top_left;

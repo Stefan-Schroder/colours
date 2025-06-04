@@ -28,6 +28,13 @@ public:
     }
 
     template <typename T>
+    static T cheap_dist(const sf::Vector2<T>& v1, const sf::Vector2<T>& v2) {
+        T dx = v2.x - v1.x;
+        T dy = v2.y - v1.y;
+        return dx * dx + dy * dy; // no sqrt
+    }
+
+    template <typename T>
     static sf::Vector2<T> limitMag(const sf::Vector2<T>& vec, T maxMagnitude) {
         T magnitude = std::sqrt(vec.x * vec.x + vec.y * vec.y);
         if (magnitude > maxMagnitude) {

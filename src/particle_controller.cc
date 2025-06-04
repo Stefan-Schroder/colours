@@ -35,11 +35,24 @@ std::vector<Particle*> ParticleController::GetLocal(sf::Vector2f position)
 void ParticleController::PhysicsUpdate(float dTime, sf::RenderWindow& window, bool is_pressed)
 {
     QuadTree qt(Box(sf::Vector2u(0,0), window.getSize()), this->particles.begin(), this->particles.end());
-    qt.Draw(window);
+    // qt.Draw(window);
 
+    size_t random_part = 2500; //mu::grU(this->particles.size());
+
+    size_t i = 0;
+
+    // std::vector<Particle*> chosen_seen;
     for (auto particle : this->particles)
     {
-        particle->Update(dTime, window.getSize(), GetLocal(particle->GetPosition()), is_pressed);
+        // particle->Update(dTime, window.getSize(), GetLocal(particle->GetPosition()), is_pressed);
+
+        auto seen = qt.Query(particle->GetPosition(), PERCEPTION);
+        particle->Update(dTime, window.getSize(), seen , is_pressed);
+
+        // if (i == random_part)
+        // {
+        //     chosen_seen = seen;
+        // }
 
         if (!particle->isAlive())
         {
@@ -67,16 +80,38 @@ void ParticleController::PhysicsUpdate(float dTime, sf::RenderWindow& window, bo
             }
             particle->Reset(sf::Vector2f(x,y));
         }
+        i++;
     }
+
+    // sf::CircleShape shape(4.0f);
+    // shape.setFillColor(sf::Color(255,0,255,255));
+    // shape.setPosition(particles[random_part]->GetPosition());
+    // window.draw(shape);
+
+    // sf::CircleShape view(PERCEPTION);
+    // view.setOutlineColor(sf::Color::Green);
+    // view.setOutlineThickness(2.0f);
+    // view.setFillColor(sf::Color::Transparent);
+    // view.setPosition(particles[random_part]->GetPosition());
+    // view.setOrigin(sf::Vector2f(PERCEPTION, PERCEPTION));
+    // window.draw(view);
+
+    // sf::CircleShape pshape(3.0f);
+    // pshape.setFillColor(sf::Color(255,255,0,255));
+    // for (auto seen_parts : chosen_seen)
+    // {
+    //     pshape.setPosition(seen_parts->GetPosition());
+    //     window.draw(pshape);
+    // }
 }
 
 void ParticleController::DrawParticles(sf::RenderWindow& window)
 {
-    // sf::CircleShape shape(10.0f);
-    // shape.setFillColor(sf::Color(255,255,255 ,25));
+    sf::CircleShape shape(10.0f);
+    shape.setFillColor(sf::Color(255,255,255 ,10));
 
-    sf::CircleShape shape(2.0f);
-    shape.setFillColor(sf::Color(255,0,255,255));
+    // sf::CircleShape shape(1.0f);
+    // shape.setFillColor(sf::Color(255,255,255,255));
 
     for (auto particle : this->particles)
     {

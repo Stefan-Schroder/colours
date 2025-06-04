@@ -6,7 +6,7 @@
 #include "box.h"
 #include "particle.h"
 
-#define CAPACITY 2
+#define CAPACITY 500
 
 typedef std::vector<Particle*>::iterator Iterator;
 
@@ -21,6 +21,8 @@ class QuadTree
 
         void build(QuadTree*, Iterator, Iterator, node_id);
         Box getBoundary() { return boundary; };
+
+        void CollectParticles(QuadTree*, std::vector<Particle*>&, sf::Vector2f, float);
 
     private:
         Box boundary;
@@ -37,6 +39,8 @@ class QuadTree
 public:
     QuadTree(Box boundary, Iterator begin, Iterator end);
     // ~QuadTree();
+
+    std::vector<Particle*> Query(sf::Vector2f point, float distance);
 
     void Draw(sf::RenderWindow&);
 

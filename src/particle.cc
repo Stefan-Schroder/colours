@@ -11,11 +11,13 @@ void Particle::Update(float dTime, sf::Vector2u bounds, std::vector<Particle*> l
     if (!this->is_alive)
         return;
 
-    float separation_force = (is_pressed) ? 150 : 80;
+    float separation_force = (is_pressed) ? 160 : 100;
+    float coheasian_force = (is_pressed) ? 40 : 95;
+
 
     // auto align_v = mu::limitMag<float>(AlignVelocity(local_particles), 0.05);
     auto align_v = mu::setMag<float>(AlignVelocity(local_particles), 50);
-    auto cohesion_v = mu::setMag<float>(CohesionVelocity(local_particles), 100);
+    auto cohesion_v = mu::setMag<float>(CohesionVelocity(local_particles), coheasian_force);
     auto separation_v = mu::setMag<float>(SeparationVelocity(local_particles), separation_force);
 
     this->velocity += cohesion_v;
@@ -32,15 +34,15 @@ void Particle::Update(float dTime, sf::Vector2u bounds, std::vector<Particle*> l
             || this->position.x < 0 
             || this->position.y < 0)
     {
-        // this->is_alive = false;
-        if (this->position.x >= bounds.x)
-            this->position.x = 0;
-        if (this->position.x < 0)
-            this->position.x = bounds.x;
-        if (this->position.y >= bounds.y)
-            this->position.y = 0;
-        if (this->position.y < 0)
-            this->position.y = bounds.y;
+        this->is_alive = false;
+        // if (this->position.x >= bounds.x)
+        //     this->position.x = 0;
+        // if (this->position.x < 0)
+        //     this->position.x = bounds.x;
+        // if (this->position.y >= bounds.y)
+        //     this->position.y = 0;
+        // if (this->position.y < 0)
+        //     this->position.y = bounds.y;
     }
 }
 
