@@ -13,6 +13,7 @@ int main()
 
     bool is_pressed = false;
 
+    bool is_first = true;
     while (window.isOpen())
     {
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q))
@@ -21,6 +22,7 @@ int main()
         }
 
         is_pressed = sf::Keyboard::isKeyPressed(sf::Keyboard::Space);
+
 
         // Close the window if it is being sent a close signal
         sf::Event event;
@@ -35,14 +37,28 @@ int main()
                 window.setView(sf::View(visibleArea));
             }
         }
+        // while(!sf::Keyboard::isKeyPressed(sf::Keyboard::J) && !is_first)
+        // {
+        //     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q))
+        //     {
+        //         window.close();
+        //     }
+        // }
+        // is_first = false;
+        // float delta_time = 0.036667;
+
         float delta_time = (clock.getElapsedTime().asMicroseconds()) / 1000000.0;
         clock.restart();
 
+        window.clear();
         pc.PhysicsUpdate(delta_time, window, is_pressed);
 
-        window.clear();
         pc.DrawParticles(window);
         window.display();
+
+        while(sf::Keyboard::isKeyPressed(sf::Keyboard::J))
+        {
+        }
     }
 
     return 0;

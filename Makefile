@@ -7,6 +7,7 @@ LDFLAGS = -lsfml-graphics -lsfml-window -lsfml-system
 # Source files and target
 SRC = src/particle_controller.cc \
 	  src/particle.cc \
+	  src/quadtree.cc \
 	  src/main.cc
 		
 TARGET = colours
