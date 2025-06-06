@@ -34,15 +34,21 @@ void Particle::Update(float dTime, sf::Vector2u bounds, std::vector<Particle*> l
             || this->position.x < 0 
             || this->position.y < 0)
     {
-        // this->is_alive = false;
-        if (this->position.x >= bounds.x)
-            this->position.x = 0;
-        if (this->position.x < 0)
-            this->position.x = bounds.x;
-        if (this->position.y >= bounds.y)
-            this->position.y = 0;
-        if (this->position.y < 0)
-            this->position.y = bounds.y;
+        if (local_particles.size() > 150)
+        {
+            this->is_alive = false;
+        }
+        else
+        {
+            if (this->position.x >= bounds.x)
+                this->position.x -= bounds.x;
+            if (this->position.x < 0)
+                this->position.x += bounds.x;
+            if (this->position.y >= bounds.y)
+                this->position.y -= bounds.y;
+            if (this->position.y < 0)
+                this->position.y += bounds.y;
+        }
     }
 }
 
@@ -108,7 +114,7 @@ sf::Vector2f Particle::SeparationVelocity(std::vector<Particle*> local_particles
         sf::Vector2f difference = this->GetPosition() - particle->GetPosition();
         // steering += sf::Vector2f(250/(1+distance.x), 250/(1+distance.y));
         // steering += sf::Vector2f(1/(1+distance.x), 1/(1+distance.y));
-        steering += mu::mult(difference, MAX_SPEED/distance);
+        steering += mu::mult(difference, MAX_SPEED/(1+distance));
     }
 
     if (local_particles.size() - 1 > 0)

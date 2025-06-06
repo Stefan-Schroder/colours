@@ -6,7 +6,7 @@
 #include "box.h"
 #include "particle.h"
 
-#define CAPACITY 100
+#define CAPACITY 200
 
 typedef std::vector<Particle*>::iterator Iterator;
 
