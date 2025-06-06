@@ -54,6 +54,11 @@ public:
         return sf::Vector2<T>(vec.x * scale, vec.y * scale);
     }
 
+    template <typename T>
+    static sf::Vector2<T> mult(const sf::Vector2<T>& vec, T scalar) {
+        return sf::Vector2<T>(vec.x * scalar, vec.y * scalar);
+    }
+
 };
 
 #endif

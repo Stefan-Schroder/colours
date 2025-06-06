@@ -34,7 +34,7 @@ std::vector<Particle*> ParticleController::GetLocal(sf::Vector2f position)
 
 void ParticleController::PhysicsUpdate(float dTime, sf::RenderWindow& window, bool is_pressed)
 {
-    QuadTree qt(Box(sf::Vector2u(0,0), window.getSize()), this->particles.begin(), this->particles.end());
+    QuadTree qt(Box(sf::Vector2f(0,0), sf::Vector2f(window.getSize())), this->particles.begin(), this->particles.end());
     // qt.Draw(window);
 
     size_t random_part = 2500; //mu::grU(this->particles.size());
@@ -109,6 +109,7 @@ void ParticleController::DrawParticles(sf::RenderWindow& window)
 {
     sf::CircleShape shape(10.0f);
     shape.setFillColor(sf::Color(255,255,255 ,10));
+    shape.setOrigin(5,5);
 
     // sf::CircleShape shape(1.0f);
     // shape.setFillColor(sf::Color(255,255,255,255));
